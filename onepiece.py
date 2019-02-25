@@ -8,13 +8,6 @@ from selenium.webdriver.common.by import By
 import os
 from multiprocessing import Pool
 
-headers = {
-    'Host':'ac.qq.com',
-    'Referer':'https://ac.qq.com/Comic/ComicInfo/id/505430',
-    'Origin':'https://ac.qq.com',
-    'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/604.5.6 (KHTML, like Gecko) Version/11.0.3 Safari/604.5.6'
-}
-
 def createDir(page):
     allDir = os.path.join(os.path.abspath('.'),"OP")
     isAllExist = os.path.exists(allDir)
@@ -34,7 +27,14 @@ def createDir(page):
     return curDir
 
 def getComicWithPage(page):
-    url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page+3)
+    if page<6:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page)
+    elif page<234:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page+1)
+    elif page<297:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page+2)
+    else:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page+3)
 
     chrome_options = Options()
     chrome_options.add_argument('--headless')
@@ -84,7 +84,8 @@ def downloadUrl(url,name):
 
 
 if __name__ == '__main__':
-    # 没有page=6，235，297
+    #######注意！！！！
+    # 没有page=6，234，297
     # page=23有问题,要关闭弹幕
-    for i in range(297,300):
+    for i in range(1,300):
         getComicWithPage(i)
