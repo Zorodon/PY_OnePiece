@@ -1,11 +1,11 @@
 import time
+import os
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import os
 from multiprocessing import Pool
 
 def createDir(page):
@@ -43,9 +43,13 @@ def getComicWithPage(page):
     driver.set_window_size(800, 1000)
     driver.get(url)
 
-    WebDriverWait(driver, 20, 0.5).until(
-        EC.presence_of_element_located((By.ID, 'comicContain'))
-    )
+    try:
+        WebDriverWait(driver, 20, 0.5).until(
+            EC.presence_of_element_located((By.ID, 'comicContain'))
+        )
+    except TimeoutError:
+        driver.quit()
+        print('web加载失败')
     print('web加载完成')
 
     # 滑动加载图片
@@ -75,7 +79,6 @@ def downloadImgs(imgs,dir):
     p.close()
     p.join()
 
-
 def downloadUrl(url,name):
     r = requests.get(url)
     with open(name, 'wb') as code:
@@ -88,4 +91,7 @@ if __name__ == '__main__':
     # 没有page=6，234，297
     # page=23有问题,要关闭弹幕
     for i in range(1,300):
+        # start = time.time()
         getComicWithPage(i)
+        # end = time.time()
+        # print('-----',end-start)
