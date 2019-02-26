@@ -82,7 +82,6 @@ def getComicWithPage(page):
             getComicWithPage(page)
             return
         print('加载图片 {}'.format(web_src))
-
     print('---图片加载完成')
     driver.quit()
 
@@ -108,6 +107,7 @@ async def downloadUrl(url,name):
             with open(name,'wb') as fp:
                 fp.write(chunk)
                 print('下载图片 {}'.format(url))
+
 
 if __name__ == '__main__':
     #######注意！！！！
