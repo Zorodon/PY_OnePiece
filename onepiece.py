@@ -81,7 +81,6 @@ def getComicWithPage(page):
             getComicWithPage(page)
             return
         print('加载图片 {}'.format(web_src))
-
     print('---图片加载完成')
     driver.quit()
 
