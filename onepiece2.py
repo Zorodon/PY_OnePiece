@@ -110,7 +110,7 @@ async def downloadUrl(url,name):
 
 
 if __name__ == '__main__':
-    #######注意！！！！
+    #######注意！！！！！！！！
     # page=23有问题,要关闭弹幕
     for i in range(1,500):
         # start = time.time()
