@@ -28,7 +28,7 @@ def createDir(page):
     return curDir
 
 def getComicWithPage(page):
-    # page缺页
+    # !!!!!!!!!!!!!!!   page缺页
     if page < 6:
         url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page)
     elif page < 234:
@@ -43,14 +43,69 @@ def getComicWithPage(page):
         url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 5)
     elif page < 493:
         url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 6)
-    else:
+    elif page < 525:
         url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 7)
+    elif page < 637:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 8)
+    elif page < 640:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 9)
+    elif page == 641:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/651'
+    elif page == 642:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/650'
+    elif page == 643:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/652'
+    elif page == 644:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/654'
+    elif page == 645:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/653'
+    elif page < 648:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 9)
+    elif page < 650:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 10)
+    elif page == 650:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/714'
+    elif page < 653:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 9)
+    elif page < 659:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 11)
+    elif page < 661:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 3)
+    elif page < 705:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 9)
+    elif page < 706:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/645'
+    elif page < 718:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 9)
+    elif page < 723:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 10)
+    elif page < 726:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 11)
+    elif page < 748:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 12)
+    elif page < 756:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 13)
+    elif page < 774:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 14)
+    elif page < 779:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 15)
+    elif page < 794:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 16)
+    elif page < 909:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 17)
+    else:
+        url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 18)
+
+    # !!!!!!!!!!!!!!!   page<679分辨率960,>679分辨率1280
+    page_height = 1000
+    if page >= 679:
+        page_height = 1300
 
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(chrome_options=chrome_options)
-    driver.set_window_size(800, 1000)
+    driver.set_window_size(900, page_height)
     driver.get(url)
 
     print('--web加载开始')
@@ -64,10 +119,10 @@ def getComicWithPage(page):
     print('--web加载完成')
 
     print('---图片加载开始')
-    # 滑动加载图片
+    # 滑动加载图片 tx自动加载下三页，隐约会有问题
     img_list = []
     web_lis = driver.find_elements(By.XPATH, "//ul[@id='comicContain']/li/img")
-    for i in range(0,1000*len(web_lis),3000):
+    for i in range(0,page_height*len(web_lis),3*page_height):
         js = 'document.getElementById("mainView").scrollTo(0,{})'.format(i)
         driver.execute_script(js)
         time.sleep(0.8)#等待时间自己控制，和网络好坏有关
@@ -94,10 +149,10 @@ def downloadImgs(imgs,dir):
     for i in range(1,len(imgs)+1):
         filename = '{}.jpg'.format(i)
         filepath = os.path.join(dir,filename)
-        tasks.append(asyncio.ensure_future(downloadUrl(imgs[i - 1], filepath)))
+        task = asyncio.ensure_future(downloadUrl(imgs[i - 1], filepath))
+        tasks.append(task)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
     print('----图片下载完成')
 
 async def downloadUrl(url,name):
@@ -112,7 +167,7 @@ async def downloadUrl(url,name):
 if __name__ == '__main__':
     #######注意！！！！！！！！
     # page=23有问题,要关闭弹幕
-    for i in range(1,500):
+    for i in range(1,935):
         # start = time.time()
         print('-----开始 ',i)
         getComicWithPage(i)
