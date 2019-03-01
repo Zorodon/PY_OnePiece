@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import StaleElementReferenceException
 from multiprocessing import Pool
 
 def createDir(page):
@@ -136,11 +137,18 @@ def getComicWithPage(page):
         time.sleep(0.6)
 
     for web_li in web_lis:
-        web_src = web_li.get_attribute("src")
+        try:
+            web_src = web_li.get_attribute("src")
+        except StaleElementReferenceException:
+            driver.quit()
+            print('---图片加载出错\n')
+            print('---重试 ', page)
+            getComicWithPage(page)
+            return
         img_list.append(web_src)
         if '//ac.gtimg.com/media/images/pixel.gif' in web_src:
             driver.quit()
-            print('---图片加载出错\n')
+            print('---图片未加载\n')
             print('---重试 ',page)
             getComicWithPage(page)
             return
