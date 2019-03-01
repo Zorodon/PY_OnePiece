@@ -17,7 +17,12 @@ def createDir(page):
     else:
         print('-总目录已存在')
 
-    curDir = os.path.join(allDir,str(page))
+    curDir = os.path.join(allDir, str(page))
+    if page<10:
+        curDir = os.path.join(allDir, '00{}'.format(page))
+    elif page<100:
+        curDir = os.path.join(allDir, '0{}'.format(page))
+
     isExist = os.path.exists(curDir)
     if not isExist:
         os.mkdir(curDir)
@@ -96,16 +101,18 @@ def getComicWithPage(page):
         url = 'https://ac.qq.com/ComicView/index/id/505430/cid/{}'.format(page + 18)
 
 
-    #!!!!!!!!!!!!!!!   page<679分辨率960,>679分辨率1280
+    #!!!!!!!!!!!!!!!
+    # page<679分辨率 617*960,
+    # page<934分辨率 877*1280
+    # <分辨率 1644*2400
     page_height = 1000
-    if page>=679:
-        page_height = 1300
+    page_width = 800
 
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(chrome_options=chrome_options)
-    driver.set_window_size(900, page_height)
+    driver.set_window_size(page_width, page_height)
     driver.get(url)
 
     print('--web加载开始')
@@ -122,10 +129,11 @@ def getComicWithPage(page):
     # 滑动加载图片 tx自动加载下三页，隐约会有问题
     img_list = []
     web_lis = driver.find_elements(By.XPATH, "//ul[@id='comicContain']/li/img")
-    for i in range(0,page_height*len(web_lis),3*page_height):
+    for i in range(0,(page_height-2)*len(web_lis),page_height):
         js = 'document.getElementById("mainView").scrollTo(0,{})'.format(i)
         driver.execute_script(js)
-        time.sleep(0.8)#等待时间自己控制，和网络好坏有关
+        # 等待时间自己控制，和网络好坏和图片大小有关
+        time.sleep(0.6)
 
     for web_li in web_lis:
         web_src = web_li.get_attribute("src")
