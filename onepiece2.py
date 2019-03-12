@@ -19,11 +19,7 @@ def createDir(page):
     else:
         print('-总目录已存在')
 
-    curDir = os.path.join(allDir, str(page))
-    if page < 10:
-        curDir = os.path.join(allDir, '00{}'.format(page))
-    elif page < 100:
-        curDir = os.path.join(allDir, '0{}'.format(page))
+    curDir = os.path.join(allDir, str(page).zfill(3))
 
     isExist = os.path.exists(curDir)
     if not isExist:
@@ -112,7 +108,7 @@ def getComicWithPage(page):
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
-    driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(page_width, page_height)
     driver.get(url)
 
@@ -134,7 +130,7 @@ def getComicWithPage(page):
         js = 'document.getElementById("mainView").scrollTo(0,{})'.format(i)
         driver.execute_script(js)
         # 等待时间自己控制，和网络好坏和图片大小有关
-        time.sleep(0.6)
+        time.sleep(0.7)
 
     for web_li in web_lis:
         try:
@@ -163,7 +159,7 @@ def downloadImgs(imgs,dir):
     print('----图片下载开始')
     tasks = []
     for i in range(1,len(imgs)+1):
-        filename = '{}.jpg'.format(i)
+        filename = ('{}.jpg'.format(i)).zfill(6)
         filepath = os.path.join(dir,filename)
         task = asyncio.ensure_future(downloadUrl(imgs[i - 1], filepath))
         tasks.append(task)
